@@ -11,6 +11,10 @@ output "Control Node public IP" {
   value = "${aws_instance.control.public_ip}"
 }
 
+output "Node private DNS" {
+  value = "${aws_instance.control.private_dns}"
+}
+
 resource "aws_security_group" "control" {
   name_prefix = "jepsen_control_"
   vpc_id      = "${var.vpc_id}"
@@ -58,6 +62,10 @@ resource "aws_instance" "control" {
       "wget https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py",
       "sudo pip install awscli --upgrade"
     ]
+  }
+
+  root_block_device {
+    volume_size = "50"
   }
 }
 
