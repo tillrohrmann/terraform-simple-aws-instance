@@ -21,3 +21,5 @@ variable "worker_root_volume_size" {
 }
 
 variable "run_id" {}
+
+variable "key_name" {}

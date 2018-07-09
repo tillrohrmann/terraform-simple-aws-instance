@@ -8,4 +8,4 @@
 # .tfvars files
 *.tfvars
 
-id_rsa*
+*id_rsa*

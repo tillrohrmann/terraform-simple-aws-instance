@@ -12,7 +12,7 @@ output "Worker private DNS" {
 
 resource "aws_key_pair" "worker" {
   key_name   = "worker_${var.run_id}"
-  public_key = "${file("id_rsa.pub")}"
+  public_key = "${file("worker_id_rsa.pub")}"
 }
 
 resource "aws_security_group" "worker" {
@@ -41,10 +41,20 @@ resource "aws_instance" "worker" {
   vpc_security_group_ids = ["${aws_security_group.worker.id}"]
   iam_instance_profile   = "${aws_iam_instance_profile.default.name}"
 
+  provisioner "file" {
+    connection {
+      agent       = false
+      private_key = "${file("worker_id_rsa")}"
+      user        = "admin"
+    }
+    source      = "./worker_id_rsa"
+    destination = "/home/admin/.ssh/id_rsa"
+  }
+
   provisioner "remote-exec" {
     connection {
       agent       = false
-      private_key = "${file("id_rsa")}"
+      private_key = "${file("worker_id_rsa")}"
       user        = "admin"
     }
     inline = [
