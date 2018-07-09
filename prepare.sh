@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-KEYNAME="control-node-key"
+KEYNAME="id_rsa"
 
 rm ${KEYNAME}*
 ssh-keygen -f "./$KEYNAME" -b 4096 -N ''

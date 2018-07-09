@@ -8,4 +8,4 @@
 # .tfvars files
 *.tfvars
 
-control-node-key*
+id_rsa*

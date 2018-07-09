@@ -1,22 +1,22 @@
 provider "aws" {
-  access_key = "${var.access_key}"
-  secret_key = "${var.secret_key}"
   region     = "${var.region}"
-  assume_role {
-    role_arn = "${var.role_arn}"
-  }
 }
 
-output "Control Node public IP" {
-  value = "${aws_instance.control.public_ip}"
+output "Worker Node public IP" {
+  value = "${aws_instance.worker.public_ip}"
 }
 
-output "Node private DNS" {
-  value = "${aws_instance.control.private_dns}"
+output "Worker private DNS" {
+  value = "${aws_instance.worker.private_dns}"
 }
 
-resource "aws_security_group" "control" {
-  name_prefix = "jepsen_control_"
+resource "aws_key_pair" "worker" {
+  key_name   = "worker_${var.run_id}"
+  public_key = "${file("id_rsa.pub")}"
+}
+
+resource "aws_security_group" "worker" {
+  name_prefix = "aws_worker_"
   vpc_id      = "${var.vpc_id}"
 
   ingress {
@@ -34,24 +34,18 @@ resource "aws_security_group" "control" {
   }
 }
 
-resource "aws_instance" "control" {
+resource "aws_instance" "worker" {
   ami                    = "${var.ami}"
   instance_type          = "${var.instance_type}"
-  key_name               = "${var.key_name}"
-  vpc_security_group_ids = ["${aws_security_group.control.id}"]
+  key_name               = "${aws_key_pair.worker.key_name}"
+  vpc_security_group_ids = ["${aws_security_group.worker.id}"]
   iam_instance_profile   = "${aws_iam_instance_profile.default.name}"
-
-  provisioner "file" {
-    connection {
-      user = "admin"
-    }
-    source      = "./control-node-key"
-    destination = "/home/admin/.ssh/id_rsa"
-  }
 
   provisioner "remote-exec" {
     connection {
-      user = "admin"
+      agent       = false
+      private_key = "${file("id_rsa")}"
+      user        = "admin"
     }
     inline = [
       "chmod 600 /home/admin/.ssh/id_rsa",
@@ -65,7 +59,9 @@ resource "aws_instance" "control" {
   }
 
   root_block_device {
-    volume_size = "50"
+    volume_size           = "${var.worker_root_volume_size}"
+    volume_type           = "gp2"
+    delete_on_termination = true
   }
 }
 
@@ -89,4 +85,5 @@ EOF
 
 resource "aws_iam_instance_profile" "default" {
   role = "${aws_iam_role.default.name}"
+  name = "worker_${var.run_id}"
 }
