@@ -60,11 +60,19 @@ resource "aws_instance" "worker" {
     inline = [
       "chmod 600 /home/admin/.ssh/id_rsa",
       "sudo apt-get -y -q update",
-      "sudo apt-get -y -q install software-properties-common curl screen",
+      "sudo apt-get -y -q install software-properties-common curl screen gnupg2 ca-certificates apt-transport-https",
       "sudo apt-get install -y -t jessie-backports openjdk-8-jre-headless ca-certificates-java",
       "sudo apt-get install -qqy openjdk-8-jdk libjna-java git gnuplot wget vim maven",
+      "sudo update-java-alternatives --jre-headless --jre --set java-1.8.0-openjdk-amd64",
       "wget https://bootstrap.pypa.io/get-pip.py && sudo python get-pip.py",
-      "sudo pip install awscli --upgrade"
+      "sudo pip install awscli --upgrade",
+      "curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -",
+      "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable\"",
+      "sudo apt-get update",
+      "sudo apt-get -y -q install docker-ce",
+      "sudo usermod -a -G docker admin",
+      "sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose",
+      "sudo chmod +x /usr/local/bin/docker-compose"
     ]
   }
 
