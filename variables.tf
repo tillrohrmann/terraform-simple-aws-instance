@@ -9,7 +9,7 @@ variable "instance_type" {
 variable "ami" {
   # The default is Debian 8.7 Jessie AMI in the eu-central-1 region.
   # https://wiki.debian.org/Cloud/AmazonEC2Image/Jessie
-  default = "ami-5900cc36"
+  default = "ami-0681ed9bb7a58a33d"
 }
 
 variable "vpc_id" {
