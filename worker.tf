@@ -75,7 +75,7 @@ resource "aws_instance" "worker" {
       "curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/",
       "sudo minikube start --vm-driver=none",
       "sudo mv /root/.kube $HOME/.kube && sudo chown -R $USER $HOME/.kube && sudo chgrp -R $USER $HOME/.kube",
-      "sed -i -e 's\root/\home/admin/\' $HOME/.kube/config",
+      "sed -i -e 's^root/^home/admin/^' $HOME/.kube/config",
       "sudo mv /root/.minikube $HOME/.minikube && sudo chown -R $USER $HOME/.minikube && sudo chgrp -R $USER $HOME/.minikube",
       "minikube update-context"
     ]
